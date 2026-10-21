@@ -19,6 +19,10 @@ def clean(value):
     value = re.sub(r"<[^>]+>", " ", value or "")
     return re.sub(r"\s+", " ", unescape(value)).strip()
 
+def date_from_title(title):
+    match = re.search(r"(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}", title or "")
+    return match.group(0) if match else None
+
 def fetch():
     request = Request(SOURCE, headers={"User-Agent": "PlumbobCompanion/0.1 (+GitHub Actions)"})
     with urlopen(request, timeout=30) as response:
@@ -37,7 +41,7 @@ def extract(html):
                 title = clean(latest.get("title")) or None
                 summary = clean(latest.get("summary")) or None
                 url = latest.get("url") or latest.get("link") or SOURCE
-                release_date = latest.get("date") or latest.get("publishedAt") or latest.get("datePublished")
+                release_date = latest.get("date") or latest.get("publishedAt") or latest.get("datePublished") or date_from_title(title)
                 return {
                     "source": url,
                     "checkedAt": datetime.now(timezone.utc).isoformat(),

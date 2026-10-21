@@ -1,9 +1,16 @@
 {
   "source": "https://www.ea.com/games/the-sims/the-sims-4/news",
-  "checkedAt": null,
+  "checkedAt": "2026-10-21T00:30:50.389275+00:00",
   "gameVersion": null,
   "releaseDate": null,
-  "title": null,
-  "summary": null,
-  "sections": []
+  "title": "Laundry List: Upcoming Bug Fixes - October 20, 2026",
+  "summary": "Welcome to the Laundry List, where we share the fixes coming in our next game update on October 27.",
+  "sections": [
+    {
+      "title": "News Article",
+      "items": [
+        "Laundry List: Upcoming Bug Fixes - October 20, 2026"
+      ]
+    }
+  ]
 }

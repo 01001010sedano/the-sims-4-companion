@@ -25,7 +25,32 @@ def fetch():
         return response.read().decode("utf-8", errors="replace")
 
 def extract(html):
-    # Prefer JSON-LD because it is more stable than visual CSS selectors.
+    # EA currently exposes the news feed in Next.js page data. Prefer this
+    # structured payload over visual CSS selectors or generated page text.
+    next_data = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html, re.S)
+    if next_data:
+        try:
+            page = json.loads(next_data.group(1)).get("props", {}).get("pageProps", {})
+            feed = page.get("initialNewsData", {}).get("items", [])
+            if feed:
+                latest = feed[0]
+                title = clean(latest.get("title")) or None
+                summary = clean(latest.get("summary")) or None
+                url = latest.get("url") or latest.get("link") or SOURCE
+                release_date = latest.get("date") or latest.get("publishedAt") or latest.get("datePublished")
+                return {
+                    "source": url,
+                    "checkedAt": datetime.now(timezone.utc).isoformat(),
+                    "gameVersion": None,
+                    "releaseDate": release_date,
+                    "title": title,
+                    "summary": summary,
+                    "sections": [{"title": latest.get("type", "Official update"), "items": [title] if title else []}]
+                }
+        except (KeyError, TypeError, json.JSONDecodeError):
+            pass
+
+    # Fallback: prefer JSON-LD because it is more stable than visual CSS selectors.
     blocks = re.findall(r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', html, re.I | re.S)
     articles = []
     for block in blocks:
